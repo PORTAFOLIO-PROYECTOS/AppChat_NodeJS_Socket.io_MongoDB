@@ -1,0 +1,19 @@
+{
+  "name": "appchat_nodejs_socket.io_mongodb",
+  "version": "1.0.0",
+  "description": "Aplicación chat realizado con nodejs, soketio y mongodb",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PORTAFOLIO-PROYECTOS/AppChat_NodeJS_Socket.io_MongoDB.git"
+  },
+  "author": "Hugo Roca",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PORTAFOLIO-PROYECTOS/AppChat_NodeJS_Socket.io_MongoDB/issues"
+  },
+  "homepage": "https://github.com/PORTAFOLIO-PROYECTOS/AppChat_NodeJS_Socket.io_MongoDB#readme"
+}
