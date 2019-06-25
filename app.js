@@ -8,8 +8,20 @@ const socket = io(http);
 
 socket.on('connection', (socket) => {
     console.log('usuario conectado');
+
+    socket.on('disconnect', () => {
+        console.log('usuario desconectado');
+    });
+
+    socket.on('chat message', (msg) => {
+        console.log(`message: ${msg}`);
+
+        socket.broadcast.emit('received', {
+            message: msg
+        });
+    });
 });
 
-http.listen(port, () =>{
+http.listen(port, () => {
     console.log(`conectado en el puerto: ${port}`);
 });
