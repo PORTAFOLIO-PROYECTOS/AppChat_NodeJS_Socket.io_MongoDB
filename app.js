@@ -8,6 +8,9 @@ const socket = io(http);
 
 app.use(express.static(`${__dirname}/client`));
 
+const chatSchema = require("./server/mongoDB/chatSchema");
+const connectDB = require("./server/mongoDB/dbconnection");
+
 socket.on('connection', (socket) => {
     console.log('usuario conectado');
 
@@ -21,9 +24,16 @@ socket.on('connection', (socket) => {
         socket.broadcast.emit('received', {
             message: msg
         });
+
+        //guardando chat
+        connectDB.then(db => {
+            console.log("Conectado correctamente al servidor");
+            let mensaje = new chatSchema({ message: msg, sender: "Anónimo" });
+            mensaje.save();
+        });
     });
 });
 
 http.listen(port, () => {
-    console.log(`conectado en el puerto ${port}`);
+    console.log(`Corriendo en el puerto ${port}`);
 });
