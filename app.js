@@ -3,7 +3,7 @@ const app = express();
 const http = require('http').Server(app);
 
 const io = require('socket.io');
-const port = 500;
+const port = 2705;
 const socket = io(http);
 
 app.use(express.static(`${__dirname}/client`));
@@ -25,5 +25,5 @@ socket.on('connection', (socket) => {
 });
 
 http.listen(port, () => {
-    console.log(`conectado en el puerto: ${port}`);
+    console.log(`conectado en el puerto ${port}`);
 });
