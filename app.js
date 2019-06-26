@@ -6,6 +6,8 @@ const io = require('socket.io');
 const port = 500;
 const socket = io(http);
 
+app.use(express.static(`${__dirname}/client`));
+
 socket.on('connection', (socket) => {
     console.log('usuario conectado');
 

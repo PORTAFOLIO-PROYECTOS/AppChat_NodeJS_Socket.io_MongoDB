@@ -1,9 +1,9 @@
 (() => {
     let socket = io();
-    $('form').submit((e)=> {
-        e.preventDefault();
-        socket.emit('chat message', $('#btn-input').val())
-        $('#btn-input').val();
+    $("form").submit(function (e) {
+        e.preventDefault(); // prevents page reloading
+        socket.emit("chat message", $("#message").val());
+        $("#message").val("");
         return true;
-    });
+    })
 })();
