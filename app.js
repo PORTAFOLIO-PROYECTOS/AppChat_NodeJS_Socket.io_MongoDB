@@ -1,11 +1,13 @@
+const port = 2705;
 const express = require("express");
 const app = express();
+const bodyParser = require("body-parser");
 const http = require("http").Server(app);
 const io = require("socket.io");
-const port = 2705;
 const socket = io(http);
 const chatRouter = require("./server/routes/chat");
 
+app.use(bodyParser.json());
 app.use("/chat", chatRouter);
 app.use(express.static(`${__dirname}/client`));
 
@@ -26,9 +28,7 @@ socket.on("connection", (socket) => {
             message: msg
         });
 
-        //guardando chat
         connectDB.then(db => {
-            console.log("Conectado correctamente al servidor");
             let mensaje = new chatSchema({ message: msg, sender: "Anónimo" });
             mensaje.save();
         });
