@@ -39,8 +39,8 @@ function crearHTML(mensaje, fecha) {
         return data.json();
     }).then(json => {
         json.map(data => {
-            let html = crearHTML(data.message, data.sender);
-            console.log(data.sender);
+            let html = crearHTML(data.message, formatTimeAgo(data.createdAt));
+            console.log(data.sender);//createdAt
             _MESSAJES.append(html);
         });
     });
