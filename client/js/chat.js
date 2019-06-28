@@ -30,6 +30,8 @@ function crearHTML(mensaje, fecha) {
 
         $("#mensaje").val("");
 
+        $(".card-body").animate({ scrollTop: $(this).height() }, "slow");
+
         return false;
     })
 })();
@@ -40,8 +42,9 @@ function crearHTML(mensaje, fecha) {
     }).then(json => {
         json.map(data => {
             let html = crearHTML(data.message, formatTimeAgo(data.createdAt));
-            console.log(data.sender);//createdAt
+            console.log(data.sender); //createdAt
             _MESSAJES.append(html);
         });
+        $(".card-body").animate({ scrollTop: $(this).height() }, "slow");
     });
 })();
