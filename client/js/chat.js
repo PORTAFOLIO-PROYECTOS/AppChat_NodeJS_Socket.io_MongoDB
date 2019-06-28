@@ -1,19 +1,35 @@
 "use strict";
 
 const _SOCKET = io();
-const _MESSAJES = document.getElementById("listaMensajes");
+const _MESSAJES = $("#listaMensajes");
+
+function crearHTML(mensaje, fecha) {
+    return `
+    <li class="left clearfix">
+        <div class="chat-body clearfix">
+            <div class="header">
+                <strong class="primary-font">Anónimo</strong>
+                <small class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-time"></span>${fecha}
+                </small>
+            </div>
+            <p>${mensaje}</p>
+        </div>
+    </li>`;
+}
 
 (() => {
     $("form").submit((e) => {
         e.preventDefault();
-        let li = document.createElement("li");
+
         _SOCKET.emit("chat message", $("#mensaje").val());
 
-        _MESSAJES.appendChild(li).append($("#mensaje").val());
+        let html = crearHTML($("#mensaje").val(), "justo ahora");
 
-        let span = document.createElement("span");
-        _MESSAJES.appendChild(span).append(`por Anónimo: justo ahora`);
+        _MESSAJES.append(html);
+
         $("#mensaje").val("");
+
         return false;
     })
 })();
@@ -21,12 +37,11 @@ const _MESSAJES = document.getElementById("listaMensajes");
 (() => {
     fetch("/chat").then(data => {
         return data.json();
-    }).then(json =>{
-        json.map(data=>{
-            let li = document.createElement("li");
-            let span = document.createElement("span");
-            _MESSAJES.appendChild(li).append(data.message);
-            _MESSAJES.appendChild(span).append(`por ${data.sender}: fechaFalta`);
+    }).then(json => {
+        json.map(data => {
+            let html = crearHTML(data.message, data.sender);
+            console.log(data.sender);
+            _MESSAJES.append(html);
         });
     });
 })();
