@@ -41,7 +41,7 @@ body{
 .card-body
 {
     overflow-y: scroll;
-    height: 500px;
+    height: 490px;
 }
 
 ::-webkit-scrollbar-track

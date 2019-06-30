@@ -2,6 +2,8 @@
 
 const _SOCKET = io();
 const _MESSAJES = $("#listaMensajes");
+const _ESCRIBIENDO = $("#escribiendo");
+const _INPUTMENSAJE = $("#mensaje");
 
 function crearHTML(mensaje, fecha) {
     return `
@@ -24,11 +26,11 @@ function crearHTML(mensaje, fecha) {
 
         _SOCKET.emit("chat message", $("#mensaje").val());
 
-        let html = crearHTML($("#mensaje").val(), "justo ahora");
+        let html = crearHTML(_INPUTMENSAJE.val(), "justo ahora");
 
         _MESSAJES.append(html);
 
-        $("#mensaje").val("");
+        _INPUTMENSAJE.val("");
 
         $(".card-body").animate({
             scrollTop: $(this).height()
@@ -59,3 +61,23 @@ function crearHTML(mensaje, fecha) {
         }, "slow");
     });
 })();
+
+_INPUTMENSAJE.on("keypress", () => {
+    _SOCKET.emit("typing", {
+        user: "Someone",
+        message: "is typing..."
+    });
+});
+
+_SOCKET.on("notifyTyping", data => {
+    _ESCRIBIENDO.html(data.user + " " + data.message);
+});
+
+//stop typing
+_INPUTMENSAJE.on("keyup", () => {
+    _SOCKET.emit("stopTyping", "");
+});
+
+_SOCKET.on("notifyStopTyping", () => {
+    _ESCRIBIENDO.html("&nbsp;");
+});

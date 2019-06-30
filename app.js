@@ -21,6 +21,18 @@ socket.on("connection", (socket) => {
         console.log("usuario desconectado");
     });
 
+    socket.on("typing", data => {
+        socket.broadcast.emit("notifyTyping", {
+            user: data.user,
+            message: data.message
+        });
+    });
+
+    //when soemone stops typing
+    socket.on("stopTyping", () => {
+        socket.broadcast.emit("notifyStopTyping");
+    });
+    
     socket.on("chat message", (msg) => {
         console.log(`message: ${msg}`);
 
@@ -29,10 +41,14 @@ socket.on("connection", (socket) => {
         });
 
         connectDB.then(db => {
-            let mensaje = new chatSchema({ message: msg, sender: "Anónimo" });
+            let mensaje = new chatSchema({
+                message: msg,
+                sender: "Anónimo"
+            });
             mensaje.save();
         });
     });
+
 });
 
 http.listen(port, () => {
