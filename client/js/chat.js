@@ -1,83 +1,115 @@
 "use strict";
 
 const _SOCKET = io();
-const _MESSAJES = $("#listaMensajes");
-const _ESCRIBIENDO = $("#escribiendo");
-const _INPUTMENSAJE = $("#mensaje");
 
-function crearHTML(mensaje, fecha) {
-    return `
-    <li class="left clearfix">
-        <div class="chat-body clearfix">
-            <div class="header">
-                <strong class="primary-font">Anónimo</strong>
-                <small class="pull-right text-muted">
-                    <span class="glyphicon glyphicon-time"></span>${fecha}
-                </small>
-            </div>
-            <p>${mensaje}</p>
-        </div>
-    </li>`;
-}
+const chat = (() => {
+    const _elementos = {
+        mensajes: $("#listaMensajes"),
+        escribiendo: $("#escribiendo"),
+        inputMensaje: $("#mensaje")
+    }
 
-(() => {
-    $("form").submit((e) => {
-        e.preventDefault();
+    const _utils = {
+        crearHTML: ((mensaje, fecha) => {
+            return `
+            <li class="left clearfix">
+                <div class="chat-body clearfix">
+                    <div class="header">
+                        <strong class="primary-font">Anónimo</strong>
+                        <small class="pull-right text-muted">
+                            <span class="glyphicon glyphicon-time"></span>${fecha}
+                        </small>
+                    </div>
+                    <p>${mensaje}</p>
+                </div>
+            </li>`;
+        }),
 
-        _SOCKET.emit("chat message", $("#mensaje").val());
+        scroolListaMensajes: (() => {
+            $(".card-body").animate({
+                scrollTop: $(this).height()
+            }, "slow");
+        })
+    }
 
-        let html = crearHTML(_INPUTMENSAJE.val(), "justo ahora");
+    const _eventos = {
+        enviarMensaje: (() => {
+            $("form").submit((e) => {
+                e.preventDefault();
 
-        _MESSAJES.append(html);
+                if (!_elementos.inputMensaje.val() ||_elementos.inputMensaje.val() === "") return false;
 
-        _INPUTMENSAJE.val("");
+                _SOCKET.emit("chat message", _elementos.inputMensaje.val());
 
-        $(".card-body").animate({
-            scrollTop: $(this).height()
-        }, "slow");
+                let html = _utils.crearHTML(_elementos.inputMensaje.val(), "justo ahora");
 
-        return false;
+                _elementos.mensajes.append(html);
+
+                _elementos.inputMensaje.val("");
+
+                _utils.scroolListaMensajes();
+
+                return false;
+            });
+        }),
+
+        obtenerMensaje: (() => {
+            _SOCKET.on("received", data => {
+                let html = _utils.crearHTML(data.message, "justo ahora");
+                _elementos.mensajes.append(html);
+                _utils.scroolListaMensajes();
+            });
+        }),
+
+        cargarMensajes: (() => {
+            fetch("/chat").then(data => {
+                return data.json();
+            }).then(json => {
+                json.map(data => {
+                    let html = _utils.crearHTML(data.message, formatTimeAgo(data.createdAt));
+                    _elementos.mensajes.append(html);
+                });
+                _utils.scroolListaMensajes();
+            });
+        }),
+
+        detectarEscribir: (() => {
+            _elementos.inputMensaje.on("keypress", () => {
+                _SOCKET.emit("typing", {
+                    user: "Someone",
+                    message: "is typing..."
+                });
+            });
+
+            _SOCKET.on("notifyTyping", data => {
+                _elementos.escribiendo.html(data.user + " " + data.message);
+            });
+        }),
+
+        detectarDejarEscribir: (() => {
+            _elementos.inputMensaje.on("keyup", () => {
+                _SOCKET.emit("stopTyping", "");
+            });
+
+            _SOCKET.on("notifyStopTyping", () => {
+                _elementos.escribiendo.html("&nbsp;");
+            })
+        })
+    }
+
+    const inicializar = (() => {
+        _eventos.enviarMensaje();
+        _eventos.obtenerMensaje();
+        _eventos.cargarMensajes();
+        _eventos.detectarEscribir();
+        _eventos.detectarDejarEscribir();
     });
 
-    _SOCKET.on("received", data => {
-        let html = crearHTML(data.message, "justo ahora");
-        _MESSAJES.append(html);
-        $(".card-body").animate({
-            scrollTop: $(this).height()
-        }, "slow");
-    });
+    return {
+        inicializar: inicializar
+    }
 })();
 
 (() => {
-    fetch("/chat").then(data => {
-        return data.json();
-    }).then(json => {
-        json.map(data => {
-            let html = crearHTML(data.message, formatTimeAgo(data.createdAt));
-            _MESSAJES.append(html);
-        });
-        $(".card-body").animate({
-            scrollTop: $(this).height()
-        }, "slow");
-    });
+    chat.inicializar();
 })();
-
-_INPUTMENSAJE.on("keypress", () => {
-    _SOCKET.emit("typing", {
-        user: "Someone",
-        message: "is typing..."
-    });
-});
-
-_SOCKET.on("notifyTyping", data => {
-    _ESCRIBIENDO.html(data.user + " " + data.message);
-});
-
-//stop typing
-_INPUTMENSAJE.on("keyup", () => {
-    _SOCKET.emit("stopTyping", "");
-});
-
-_SOCKET.on("notifyStopTyping", () => {
-    _ESCRIBIENDO.html("&nbsp;");
-});
