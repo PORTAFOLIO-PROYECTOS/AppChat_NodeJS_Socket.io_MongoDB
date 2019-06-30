@@ -30,10 +30,20 @@ function crearHTML(mensaje, fecha) {
 
         $("#mensaje").val("");
 
-        $(".card-body").animate({ scrollTop: $(this).height() }, "slow");
+        $(".card-body").animate({
+            scrollTop: $(this).height()
+        }, "slow");
 
         return false;
-    })
+    });
+
+    _SOCKET.on("received", data => {
+        let html = crearHTML(data.message, "justo ahora");
+        _MESSAJES.append(html);
+        $(".card-body").animate({
+            scrollTop: $(this).height()
+        }, "slow");
+    });
 })();
 
 (() => {
@@ -42,9 +52,10 @@ function crearHTML(mensaje, fecha) {
     }).then(json => {
         json.map(data => {
             let html = crearHTML(data.message, formatTimeAgo(data.createdAt));
-            console.log(data.sender); //createdAt
             _MESSAJES.append(html);
         });
-        $(".card-body").animate({ scrollTop: $(this).height() }, "slow");
+        $(".card-body").animate({
+            scrollTop: $(this).height()
+        }, "slow");
     });
 })();
