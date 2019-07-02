@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 mongoose.Promise = require("bluebird");
 
-const url = "mongodb+srv://hugoroca:cutu*2021@cluster0-xu1hg.mongodb.net/test";
+const url = "localhost:1111/test"; //conexion mongo
 
 const connect = mongoose.connect(url, { useNewUrlParser: true });
 
